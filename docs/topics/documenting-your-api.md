@@ -11,7 +11,114 @@ There are also a number of great third-party documentation packages available.
 
 ## Generating documentation from OpenAPI schemas
 
-TODO: Add examples for Swagger UI & ReDoc.
+There are a number of packages available that allow you to generate HTML
+documenation pages from OpenAPI schemas.
+
+Two popular options are [Swagger UI][swagger-ui] and [ReDoc][redoc].
+
+Both require little more than the location of your static schema file or
+dynamic `SchemaView` endpoint.
+
+### A mimimal example with Swagger UI
+
+Assuming you've followed the example from the schemas documentation for routing
+a dynamic `SchemaView`, a mimimal Django template for using Swagger UI might be
+this:
+
+```html
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Swagger</title>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="//unpkg.com/swagger-ui-dist@3/swagger-ui.css" />
+  </head>
+  <body>
+    <div id="swagger-ui"></div>
+    <script src="//unpkg.com/swagger-ui-dist@3/swagger-ui-bundle.js"></script>
+    <script>
+    const ui = SwaggerUIBundle({
+        url: "{% url schema_url %}",
+        dom_id: '#swagger-ui',
+        presets: [
+          SwaggerUIBundle.presets.apis,
+          SwaggerUIBundle.SwaggerUIStandalonePreset
+        ],
+        layout: "BaseLayout"
+      })
+    </script>
+  </body>
+</html>
+```
+
+Save this in your templates folder as `swagger-ui.html`. Then route a
+`TemplateView` in your project's URL conf:
+
+```python
+from django.views.generic import TemplateView
+
+urlpatterns = [
+    # ...
+    # Route TemplateView to serve Swagger UI template.
+    #   * Provide `extra_context` with view name of `SchemaView`.
+    path('swagger-ui/', TemplateView.as_view(
+        template_name='swagger-ui.html',
+        extra_context={'schema_url':'openapi-schema'}
+    ), name='swagger-ui'),
+]
+```
+
+See the [Swagger UI documentation][swagger-ui] for advanced usage.
+
+### A mimimal example with ReDoc.
+
+Assuming you've followed the example from the schemas documentation for routing
+a dynamic `SchemaView`, a mimimal Django template for using Swagger UI might be
+this:
+
+```html
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>ReDoc</title>
+    <!-- needed for adaptive design -->
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:300,400,700|Roboto:300,400,700" rel="stylesheet">
+    <!-- ReDoc doesn't change outer page styles -->
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <redoc spec-url='{% url schema_url %}'></redoc>
+    <script src="https://cdn.jsdelivr.net/npm/redoc@next/bundles/redoc.standalone.js"> </script>
+  </body>
+</html>
+```
+
+Save this in your templates folder as `redoc.html`. Then route a `TemplateView`
+in your project's URL conf:
+
+```python
+from django.views.generic import TemplateView
+
+urlpatterns = [
+    # ...
+    # Route TemplateView to serve the ReDoc template.
+    #   * Provide `extra_context` with view name of `SchemaView`.
+    path('redoc/', TemplateView.as_view(
+        template_name='redoc.html',
+        extra_context={'schema_url':'openapi-schema'}
+    ), name='redoc'),
+]
+```
+
+See the [ReDoc documentation][redoc] for advanced usage.
 
 ## Third party packages
 
@@ -161,4 +268,7 @@ To implement a hypermedia API you'll need to decide on an appropriate media type
 [image-self-describing-api]: ../img/self-describing.png
 [schemas-examples]: ../api-guide/schemas/#examples
 [metadata-docs]: ../api-guide/metadata/
+
+[swagger-ui]: https://swagger.io/tools/swagger-ui/
+[redoc]: https://github.com/Rebilly/ReDoc
 
