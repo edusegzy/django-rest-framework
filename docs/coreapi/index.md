@@ -26,3 +26,4 @@ For reference this folder contains the old CoreAPI related documentation:
 
 * [Excerpts from _Documenting your API_ topic page](/coreapi/from-documenting-your-api.md).
 * `rest_framework.schemas` API Reference.
+* [Tutorial 7: Schemas & client libraries](/coreapi/7-schemas-and-client-libraries.md)
